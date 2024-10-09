@@ -9,7 +9,6 @@ class Program
     private DiscordSocketClient _client;
     static void Main(string[] args) => new Program().RunBotAsync().GetAwaiter().GetResult();
     private readonly HttpClient _httpClient = new HttpClient();
-
     public async Task RunBotAsync()
     {
         var config = new DiscordSocketConfig
@@ -20,8 +19,8 @@ class Program
         _client.Log += Log;
         _client.MessageReceived += MessageReceivedAsync;
         _client.ButtonExecuted += HandleButtonAsync;
-        string botToken = "MTI5MTc4Mjg4NTI1NDEwNzE3OA.GcLAwn.yiwR9eNAAU0wHHM0LnueS2xfpYKOcOzVC4swkU";
-        await _client.LoginAsync(TokenType.Bot, botToken);
+        string token = Environment.GetEnvironmentVariable("DISCORD_BOT_TOKEN");
+        await _client.LoginAsync(TokenType.Bot, token);
         await _client.StartAsync();
         await Task.Delay(-1);
     }
