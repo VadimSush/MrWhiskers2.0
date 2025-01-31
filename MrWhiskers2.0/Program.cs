@@ -42,74 +42,95 @@ class Program
             // Respond to specific phrases
             if (message.Content.ToLower().Contains("hello bot"))
             {
-                //await textChannel.SendMessageAsync($"G'day, {message.Author.Username}! How's it going?");
-                var embed = new EmbedBuilder()
-                {
-                    Title = "Woof! HR is here to assist you!",
-                    //Description = "Hello, frend. What can HR do for you?",
-                    Color = Color.Green,
-                };
-                embed.AddField("Fun Fact", "Did you know I can do many other things too?");
-                embed.WithFooter("I'm here to assist you!");
-                embed.ThumbnailUrl = _client.CurrentUser.GetAvatarUrl() ?? _client.CurrentUser.GetDefaultAvatarUrl();
-                embed.WithImageUrl("https://i.imgur.com/RLe6xwo.png");
-                await message.Channel.SendMessageAsync(embed: embed.Build());
+                await SayHelloInTextChannel(textChannel, message);
             }
         }
         if (message.Content.ToLower().Contains("random gif"))
         {
-            string gifUrl = await GetRandomGifUrlAsync("funny dog"); // You can change the search term as needed
-            if (gifUrl != null)
-            {
-                await message.Channel.SendMessageAsync(gifUrl);
-            }
-            else
-            {
-                await message.Channel.SendMessageAsync("Sorry, I couldn't fetch a GIF at the moment.");
-            }
+            await SendGif(message);
         }
         if (message.Content.ToLower().Contains("hr decision"))
         {
-            // Create a randomizer
-            var random = new Random();
-            bool isYes = random.Next(0, 2) == 0;
-            // Use Unicode emojis for "Yes" and "No"
-            string answer = isYes ? "\u2705 Yes" : "\u274C No";  // Unicode for ✅ and ❌
-            string userName = message.Author.Username;
-            // Create an embed with the random answer
-            var embed = new EmbedBuilder()
-            {
-                Title = $"HR has made their decision, {userName}",
-                Description = $"The answer is: **{answer}**", // Add the emoji in the response
-                Color = isYes ? Color.Green : Color.Red, // Green for "Yes", Red for "No"
-                ThumbnailUrl= _client.CurrentUser.GetAvatarUrl() ?? _client.CurrentUser.GetDefaultAvatarUrl(),
-                ImageUrl = ("https://i.imgur.com/RLe6xwo.png"),
-            };
-            // Send the embed message
-            await message.Channel.SendMessageAsync(embed: embed.Build());
+            await MakeDecision(message);
         }
         if (message.Content.ToLower().Contains("ask bot"))
         {
-            // Create a randomizer
-            var random = new Random();
-            bool isYes = random.Next(0, 2) == 0;
-            // Get the username of the person who called the command
-            string username = message.Author.Username;
-            // Create an embed with a message
-            var embed = new EmbedBuilder()
-            {
-                Title = "Choose Your Answer",
-                Description = $"Hey **{username}**, choose one of the options below:",
-                Color = Color.Blue
-            };
-            // Create the buttons
-            var builder = new ComponentBuilder()
-                .WithButton("Yes", "button_yes", ButtonStyle.Success)
-                .WithButton("No", "button_no", ButtonStyle.Danger);
-            // Send the embed with buttons
-            await message.Channel.SendMessageAsync(embed: embed.Build(), components: builder.Build());
+            await AskBot(message);
         }
     }
+
+    private async Task SayHelloInTextChannel(SocketTextChannel textChannel, SocketMessage message)
+    {
+        //await textChannel.SendMessageAsync($"G'day, {message.Author.Username}! How's it going?");
+        var embed = new EmbedBuilder()
+        {
+            Title = "Woof! HR is here to assist you!",
+            //Description = "Hello, frend. What can HR do for you?",
+            Color = Color.Green,
+        };
+        embed.AddField("Fun Fact", "Did you know I can do many other things too?");
+        embed.WithFooter("I'm here to assist you!");
+        embed.ThumbnailUrl = _client.CurrentUser.GetAvatarUrl() ?? _client.CurrentUser.GetDefaultAvatarUrl();
+        embed.WithImageUrl("https://i.imgur.com/RLe6xwo.png");
+        await message.Channel.SendMessageAsync(embed: embed.Build());
+    }
+
+    private async Task SendGif(SocketMessage message)
+    {
+        string gifUrl = await GetRandomGifUrlAsync("funny dog"); // You can change the search term as needed
+        if (gifUrl != null)
+        {
+            await message.Channel.SendMessageAsync(gifUrl);
+        }
+        else
+        {
+            await message.Channel.SendMessageAsync("Sorry, I couldn't fetch a GIF at the moment.");
+        }
+    }
+
+    private async Task MakeDecision(SocketMessage message)
+    {
+        // Create a randomizer
+        var random = new Random();
+        bool isYes = random.Next(0, 2) == 0;
+        // Use Unicode emojis for "Yes" and "No"
+        string answer = isYes ? "\u2705 Yes" : "\u274C No";  // Unicode for ✅ and ❌
+        string userName = message.Author.Username;
+        // Create an embed with the random answer
+        var embed = new EmbedBuilder()
+        {
+            Title = $"HR has made their decision, {userName}",
+            Description = $"The answer is: **{answer}**", // Add the emoji in the response
+            Color = isYes ? Color.Green : Color.Red, // Green for "Yes", Red for "No"
+            ThumbnailUrl = _client.CurrentUser.GetAvatarUrl() ?? _client.CurrentUser.GetDefaultAvatarUrl(),
+            ImageUrl = ("https://i.imgur.com/RLe6xwo.png"),
+        };
+        // Send the embed message
+        await message.Channel.SendMessageAsync(embed: embed.Build());
+    }
+
+    private async Task AskBot(SocketMessage message)
+    {
+        // Create a randomizer
+        var random = new Random();
+        bool isYes = random.Next(0, 2) == 0;
+        // Get the username of the person who called the command
+        string username = message.Author.Username;
+        // Create an embed with a message
+        var embed = new EmbedBuilder()
+        {
+            Title = "Choose Your Answer",
+            Description = $"Hey **{username}**, choose one of the options below:",
+            Color = Color.Blue
+        };
+        // Create the buttons
+        var builder = new ComponentBuilder()
+            .WithButton("Yes", "button_yes", ButtonStyle.Success)
+            .WithButton("No", "button_no", ButtonStyle.Danger);
+        // Send the embed with buttons
+        await message.Channel.SendMessageAsync(embed: embed.Build(), components: builder.Build());
+    }
+
     private async Task HandleButtonAsync(SocketMessageComponent component)
     {
         // Check which button was clicked
